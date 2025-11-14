@@ -3,7 +3,7 @@ import vllm.model_executor.models.config
 from vllm.logger import init_logger
 from vllm.model_executor.models import ModelRegistry
 from vllm.model_executor.models.config import MambaModelConfig
-from vllm.utils import cdiv
+from vllm.utils.math_utils import cdiv
 from vllm.v1.kv_cache_interface import FullAttentionSpec, MambaSpec
 
 from vllm_ascend.utils import vllm_version_is

@@ -3,7 +3,7 @@ from typing import Optional, Union
 import numpy as np
 import torch
 from vllm.distributed import get_dcp_group
-from vllm.utils import cdiv
+from vllm.utils.math_utils import cdiv
 
 from vllm_ascend.utils import prefill_context_parallel_enable
 

@@ -13,7 +13,8 @@ from vllm.config import VllmConfig, get_current_vllm_config
 from vllm.distributed import get_tensor_model_parallel_world_size
 from vllm.model_executor.layers.linear import (LinearBase,
                                                UnquantizedLinearMethod)
-from vllm.utils import cdiv, round_down
+from vllm.utils import round_down
+from vllm.utils.math_utils import cdiv
 
 import vllm_ascend.envs as envs_ascend
 from vllm_ascend.ascend_config import get_ascend_config

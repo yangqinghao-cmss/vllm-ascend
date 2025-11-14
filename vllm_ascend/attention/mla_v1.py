@@ -22,7 +22,8 @@ from vllm.forward_context import ForwardContext, get_forward_context
 from vllm.logger import logger
 from vllm.model_executor.layers.linear import (LinearBase,
                                                UnquantizedLinearMethod)
-from vllm.utils import cdiv, round_down
+from vllm.utils import round_down
+from vllm.utils.math_utils import cdiv
 from vllm.v1.attention.backends.utils import AttentionCGSupport
 
 from vllm_ascend import envs

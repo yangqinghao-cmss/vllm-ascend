@@ -72,7 +72,8 @@ from vllm.pooling_params import PoolingParams
 from vllm.sampling_params import SamplingType
 from vllm.sequence import IntermediateTensors
 from vllm.tasks import GenerationTask, PoolingTask, SupportedTask
-from vllm.utils import cdiv, length_from_prompt_token_ids_or_embeds
+from vllm.utils import length_from_prompt_token_ids_or_embeds
+from vllm.utils.math_utils import cdiv
 from vllm.utils.jsontree import json_map_leaves
 from vllm.v1.attention.backends.gdn_attn import GDNAttentionMetadataBuilder
 from vllm.v1.attention.backends.utils import (
@@ -3013,6 +3014,7 @@ class NPUModelRunner(LoRAModelRunnerMixin):
             num_scheduled_tokens_list[-1] += num_tokens % num_reqs
         assert sum(num_scheduled_tokens_list) == num_tokens
         assert len(num_scheduled_tokens_list) == num_reqs
+        num_sampled_tokens = np.ones(num_reqs, dtype=np.int32)
         num_scheduled_tokens = np.array(num_scheduled_tokens_list,
                                         dtype=np.int32)
 
@@ -3020,7 +3022,8 @@ class NPUModelRunner(LoRAModelRunnerMixin):
             self.eplb_updator.forward_before()
 
         with self.maybe_dummy_run_with_lora(self.lora_config,
-                                            num_scheduled_tokens):
+                                            num_scheduled_tokens,
+                                            num_sampled_tokens):
             if self.is_multimodal_model:
                 input_ids = None
                 inputs_embeds = self.inputs_embeds.gpu[:num_tokens]
@@ -3790,9 +3793,11 @@ class NPUModelRunner(LoRAModelRunnerMixin):
                     self.vllm_config,
                     self.device,
                 ))
-                attn_group = AttentionGroup(attn_backend,
-                                            attn_metadata_builders,
-                                            layer_names, kv_cache_spec)
+                attn_group = AttentionGroup(backend=attn_backend,
+                                            metadata_builders=attn_metadata_builders,
+                                            layer_names=layer_names,
+                                            kv_cache_spec=kv_cache_spec,
+                                            kv_cache_group_id=0) # dummy
                 attn_groups.append(attn_group)
             return attn_groups
 
